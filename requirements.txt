@@ -1,0 +1,6 @@
+pandas~=2.0.3
+inflect
+tabulate
+google-cloud-translate
+anyascii
+diskcache
