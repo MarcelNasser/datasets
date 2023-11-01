@@ -4,3 +4,6 @@ tabulate
 google-cloud-translate
 anyascii
 diskcache
+pylint
+
+
