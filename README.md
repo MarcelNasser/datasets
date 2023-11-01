@@ -1,7 +1,7 @@
 # Open Datasets for Research
 
 **Datasets herein are automatically generated. There are released under the MIT [licence](LICENSE) and liabilities.<br> 
-We do not guarantee the correctness of those datasets. At best, they are as reliable as data sources and data pipelines.** 
+We do not guarantee the accuracy of those datasets. At best, they are as accurate as data sources and data pipelines.** 
 
 ## `numbers`
 
@@ -20,7 +20,8 @@ We do not guarantee the correctness of those datasets. At best, they are as reli
 
 *data source*: 
 - google translate cloud [service](https://cloud.google.com/translate/docs/languages)
-- romanization [lib](https://github.com/anyascii/anyascii) and data [source](https://loc.gov/catdir/cpso/roman)
+- romanization [lib](https://github.com/anyascii/anyascii) and [database](https://loc.gov/catdir/cpso/roman)
+- according to [documentation](https://cloud.google.com/translate/docs/advanced/romanize-text), google translate API features a romanization algorithm as well. But API calls weren't working in the client library, the pricing of those calls wasn't clear and they weren't convenient as two calls are needed per text translation. We prefered this open source library, which works pretty well and is quite accurate.
 
 *data pipeline*: 
 
