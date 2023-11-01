@@ -1,10 +1,12 @@
 """
 Numbers translation calls to Google translate cloud service
 """
+import os
 import re
 from os.path import join
 from pathlib import Path
 from anyascii import anyascii
+import hashlib
 
 import inflect
 import argparse
@@ -17,8 +19,7 @@ cache_dir = join(Path(__file__).resolve().parent, '.cache')
 cache = FanoutCache(directory=str(cache_dir))
 logger = getLogger("translate")
 basicConfig(level=ERROR, format="%(levelname)s: %(message)s")
-google_project = "tesselite"
-separator = "|"
+SEPARATOR = "|"
 
 
 class Translator:
@@ -29,21 +30,41 @@ class Translator:
     def __init__(self):
         self.client = None
 
-    def hash(self, lang, text):
+    def hash(self, lang: str, text: str) -> str:
         """
-        custom hash key
-        :param lang:
-        :param text:
-        :return:
+        map translation information towards a unique string
+        :param lang: translate english to 'language'
+        :param text: text to translate
+        :return: hash equivalent string
         """
-        return f"{self.__class__.__name__}{separator}{lang}{separator}{len(text)}"
+        __hash = hashlib.md5(lang.encode())
+        __hash.update(text.encode())
+        __hash.update(self.__class__.__name__.encode())
+        return __hash.hexdigest()
 
     def reload(self):
+        """
+        Lazy loading of client lib to optimize performance
+        :return:
+        """
         if not self.client:
             from google.cloud import translate
             self.client = translate.TranslationServiceClient()
 
-    def request(self, lang, text):
+    def request(self, lang: str, text: str):
+        """
+        Wrap client request for unittest without network
+        :param lang:
+        :param text:
+        :return: iterable object
+        """
+        # tip: load client just in time to optim performance
+        self.reload()
+        # load billing "project" in google cloud
+        google_project = os.environ.get("GOOGLE_PROJECT")
+        if google_project is None:
+            logger.error("env variable 'GOOGLE_PROJECT' is not set.")
+            exit(1)
         return self.client.translate_text(parent=f"projects/{google_project}/locations/global",
                                           contents=[text],
                                           mime_type="text/plain",
@@ -51,7 +72,7 @@ class Translator:
                                           target_language_code=lang,
                                           )
 
-    def translate(self, lang, text) -> str:
+    def translate(self, lang: str, text: str) -> str:
         """
         :param lang: translate english to 'language'
         :param text: text to translate
@@ -61,8 +82,7 @@ class Translator:
         translation = cache.get(self.hash(lang, text))
         if translation:
             return translation
-        # tip: load client just in time to optim performance
-        self.reload()
+
         response = self.request(lang=lang, text=text)
         translation = ""
         for tr in response.translations:
@@ -80,8 +100,8 @@ def integers_enumerate(maximum: int) -> str:
     engine = inflect.engine()
     text = ""
     for n in range(1, maximum + 1):
-        text += engine.number_to_words(n, group=0) + separator + ' '
-    return text[:-(len(separator) + 1)]
+        text += engine.number_to_words(n, group=0) + SEPARATOR + ' '
+    return text[:-(len(SEPARATOR) + 1)]
 
 
 def to_roman(text: str) -> str:
@@ -98,7 +118,7 @@ def to_list(text: str) -> list:
     Split into a list entry string
     :return: list of numbers
     """
-    return re.sub(rf"('\s+[\\{separator}]\s')", separator, text, flags=re.UNICODE).split(separator)
+    return re.sub(rf"('\s+[\\{SEPARATOR}]\s')", SEPARATOR, text, flags=re.UNICODE).split(SEPARATOR)
 
 
 def __integers_list(opt):
@@ -135,12 +155,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="scripts")
     subparsers = parser.add_subparsers(help="select the action's command")
     sub_1 = subparsers.add_parser("list", help="list integer in english")
-    sub_1.add_argument("--maximum", "-m", help=f"list integers up to this maximum", nargs="?", type=int, default=99)
+    sub_1.add_argument("--maximum", "-m",
+                       help="list integers up to this maximum", nargs="?",
+                       type=int, default=99)
     sub_1.set_defaults(func=__integers_list)
     sub_2 = subparsers.add_parser("translate", help="translate integer list")
-    sub_2.add_argument("--maximum", "-m", help=f"list integers up to this maximum", nargs="?", type=int, default=99)
-    sub_2.add_argument("--language", "-l", help=f"destination language", nargs="+", type=str, default=[])
-    sub_2.add_argument("--output", "-o", help=f"output format", type=str,
+    sub_2.add_argument("--maximum", "-m",
+                       help="list integers up to this maximum", nargs="?",
+                       type=int, default=99)
+    sub_2.add_argument("--language", "-l",
+                       help="destination language", nargs="+", type=str, default=[])
+    sub_2.add_argument("--output", "-o", help="output format", type=str,
                        choices=["text", "csv", "json"], default="text")
 
     sub_2.set_defaults(func=__integers_translate)

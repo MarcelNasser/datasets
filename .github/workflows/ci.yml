@@ -1,0 +1,23 @@
+# This workflow will install Python dependencies, run test_blockchain and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Integration Tests
+
+on:
+  push:
+    paths:
+      - .github/workflows/ci.yml
+      - pipelines/**
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container: marcelndeffo/builds:datasets
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - run: |
+        pylint --disable=C,R pipelines
