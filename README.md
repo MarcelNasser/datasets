@@ -7,7 +7,7 @@ We do not guarantee the accuracy of those datasets. At best, they are as accurat
 
 *content:*
 
-- list all languages counting system.<br>
+- list all languages numbers from 1 to 99.<br>
 
 - the dataset in broken into csv tables:
 
