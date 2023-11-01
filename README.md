@@ -1,11 +1,26 @@
 # Open Datasets for Research
 
 **Datasets herein are automatically generated. There are released under the MIT [licence](LICENSE) and liabilities.<br> 
-We do not guarantee the correctness of those datasets. At best, they are as reliable as data sources and data pipelines...** 
+We do not guarantee the correctness of those datasets. At best, they are as reliable as data sources and data pipelines.** 
 
 ## `numbers`
 
-*data source*: google translate cloud [service](https://cloud.google.com/translate/docs/languages)
+*content:*
+
+- list all languages counting system.<br>
+
+- the dataset in broken into csv tables:
+
+| table             | Languages                     |
+|-------------------|-------------------------------|
+| bantus.csv        | xh, ny, lg, ln, zu            |
+| indo-european.csv | en, ru, uk, be, bg, .. ka, az |
+
+*language codes [here](https://cloud.google.com/translate/docs/languages)*
+
+*data source*: 
+- google translate cloud [service](https://cloud.google.com/translate/docs/languages)
+- romanization [lib](https://github.com/anyascii/anyascii) and data [source](https://loc.gov/catdir/cpso/roman)
 
 *data pipeline*: 
 
@@ -39,3 +54,14 @@ python pipelines/translate/run.py translate -l xh ny lg ln zu -o csv > numbers/b
 python pipelines/translate/run.py translate -l ru uk be bg mk bs hr sr sk pl lv lt sl cs ro sq \
 it el la co es ca fr de no sv fi hu hy ka az -o csv > numbers/indo-european.csv
 ````
+
+## `Contribution`
+
+This is an open source project but not very open yet, as the scope of this project is not well-defined. The project is for the moment a backyard to dump research data.
+Maybe the project is short-lived. It will be a waste of time to onboard new people given the uncertainty here.
+
+In any case, you can reach me on [LinkedIn](https://www.linkedin.com/in/marcelndeffo/).
+
+Cheers.
+
+
