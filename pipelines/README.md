@@ -2,6 +2,23 @@
 
 ### Pipeline Translate
 
+- purpose
+  - this pipeline generates integers table in more than 50 languages `-o csv`
+    - it can output in json `-o json`
+    - or in human-readable text `-o text`
+  - language tables are stored column-wise
+    - can pass in script entry as many language as needed `-l uk be bg mk`
+  - english language is always present in the output table
+    - do not pass `-l en`
+    - otherwise google-translate will throw an error that will be raised 
+  - it can translate from 1 up to 99 
+    - the maximum cap can be set to lesser or greater number `-m 111`
+  - it can translate up to 999 and even more
+    - but it is not well tested 
+    - and not recommended as the pipeline is not designed for it:
+      - some part can scale (deserialization)
+      - some part might not (serialization)
+
 - requires
   - python 3.8+
   - google cloud [cli](https://cloud.google.com/sdk/docs/install)
@@ -31,3 +48,15 @@ python pipelines/translate/run.py translate -l xh ny lg ln zu -o csv > numbers/b
 python pipelines/translate/run.py translate -l ru uk be bg mk bs hr sr sk pl lv lt sl cs ro sq \
 it el la co es ca fr de no sv fi hu hy ka az -o csv > numbers/indo-european.csv
 ````
+
+- pipeline stages
+
+| stage       | purpose                               | input                                 | output |
+|-------------|---------------------------------------|---------------------------------------|--------|
+| serialize   | create integers string in english     | integers maximum                      | string |
+| translate   | API calls to Google Translate service | serialized string and target language | string |
+| romanize    | convert to ascii characters           | serialized string                     | string |
+| deserialize | create integers table                 | serialized string                     | table  |
+
+
+![img](docs/translation-pipeline.png)

@@ -26,12 +26,17 @@ We do not guarantee the accuracy of those datasets. At best, they are as accurat
 
 *data source*: 
 - google translate cloud [service](https://cloud.google.com/translate/docs/languages)
-- romanization [lib](https://github.com/anyascii/anyascii) and [database](https://loc.gov/catdir/cpso/roman)
-- according to [documentation](https://cloud.google.com/translate/docs/advanced/romanize-text), google translate API features a romanization algorithm as well. But API calls weren't working in the client library, the pricing of those calls wasn't clear and they weren't convenient as two calls are needed per text translation. We prefered this open source library, which works pretty well and is quite accurate.
+  - accurate and available datasource
+  - featuring a programmatic interface and client library
+- romanization [library](https://github.com/anyascii/anyascii) and [database](https://loc.gov/catdir/cpso/roman)
+  - according to [documentation](https://cloud.google.com/translate/docs/advanced/romanize-text), google translate API features a romanization algorithm as well. 
+  - But API calls weren't working in the client library, and calls pricing wasn't clear 
+  - Moreover it wasn't convenient to double call (translation then romanization). 
+  - Threfore, we prefered this open source [library](https://github.com/anyascii/anyascii), which works pretty well and suits our needs.
 
 *data pipeline*: documentation [here](pipelines/README.md)
 
-![](pipelines/docs/translation-pipeline.png)
+![img](pipelines/docs/translation-pipeline.png)
 
 
 ## `Contribution`
