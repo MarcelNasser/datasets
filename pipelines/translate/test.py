@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from pipelines.translate.run import to_list, to_roman, SEPARATOR, integers_enumerate, Translator
+from pipelines.translate.run import deserialize, to_roman, SEPARATOR, serialize, Translator
 
 
 class APITranslate(unittest.TestCase):
@@ -19,11 +19,11 @@ class APITranslate(unittest.TestCase):
 
     def test_list(self):
         word = SEPARATOR.join(self.letter_b.other.values())
-        for le, lt in zip(to_list(word), self.letter_b.other.values()):
+        for le, lt in zip(deserialize(word), self.letter_b.other.values()):
             assert le == lt
 
     def test_enumerate(self):
-        assert len(to_list(integers_enumerate(self.maximum))) == self.maximum
+        assert len(deserialize(serialize(self.maximum))) == self.maximum
 
     @patch('pipelines.translate.run.Translator.request', return_value=letter_b)
     def test_translator(self, mocked):

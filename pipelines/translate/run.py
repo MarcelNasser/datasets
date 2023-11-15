@@ -91,7 +91,7 @@ class Translator:
         return translation
 
 
-def integers_enumerate(maximum: int) -> str:
+def serialize(maximum: int) -> str:
     """
     Enumerate numbers in English
     :param maximum: maximum integer without cap
@@ -113,7 +113,7 @@ def to_roman(text: str) -> str:
     return anyascii(text).replace("  ", "")
 
 
-def to_list(text: str) -> list:
+def deserialize(text: str) -> list:
     """
     Split into a list entry string
     :return: list of numbers
@@ -126,7 +126,7 @@ def __integers_list(opt):
     :param opt:
     :return: print to standard output numbers serialized list
     """
-    print(integers_enumerate(opt.maximum))
+    print(serialize(opt.maximum))
 
 
 def __integers_translate(opt):
@@ -134,11 +134,11 @@ def __integers_translate(opt):
     :param opt:
     :return: print to standard output translated numbers csv,txt or json format
     """
-    text = integers_enumerate(opt.maximum)
-    translations = {"en": to_list(text)}
+    text = serialize(opt.maximum)
+    translations = {"en": deserialize(text)}
     translator = Translator()
     for language in opt.language:
-        translations[language] = to_list(to_roman(translator.translate(lang=language, text=text)))
+        translations[language] = deserialize(to_roman(translator.translate(lang=language, text=text)))
     if opt.output == "json":
         import json
         print(json.dumps(translations))
