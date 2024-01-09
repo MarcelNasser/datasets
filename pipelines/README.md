@@ -2,7 +2,7 @@
 
 ### Pipeline Translate
 
-- purpose
+- scope
   - this pipeline generates integers table in more than 50 languages `-o csv`
     - it can output in json `-o json`
     - or in human-readable text `-o text`
@@ -19,7 +19,7 @@
       - some part can scale (deserialization)
       - some part might not (serialization)
 
-- requires
+- requirements
   - python 3.8+
   - google cloud [cli](https://cloud.google.com/sdk/docs/install)
   - google cloud project for [billing](https://console.cloud.google.com/)
@@ -49,7 +49,11 @@ python pipelines/translate/run.py translate -l ru uk be bg mk bs hr sr sk pl lv 
 it el la co es ca fr de no sv fi hu hy ka az -o csv > numbers/indo-european.csv
 ````
 
-- pipeline stages
+- architecture
+  - each script calls run through 4 stages
+  - each stage serve a datastructure transformation and API calls
+    - either towards a internal library
+    - or towards a cloud service
 
 | stage       | purpose                               | input                                 | output |
 |-------------|---------------------------------------|---------------------------------------|--------|
