@@ -2,10 +2,10 @@
 Numbers translation calls to Google translate cloud service
 """
 import os
-import re
 from os.path import join
 from pathlib import Path
 from anyascii import anyascii
+from pipelines.translate import SUPPORTED_LANG
 import hashlib
 
 import inflect
@@ -17,9 +17,10 @@ from logging import getLogger, basicConfig, ERROR
 
 cache_dir = join(Path(__file__).resolve().parent, '.cache')
 cache = FanoutCache(directory=str(cache_dir))
-logger = getLogger("translate")
 basicConfig(level=ERROR, format="%(levelname)s: %(message)s")
-SEPARATOR = "|"
+logger = getLogger("translate")
+logger.setLevel("DEBUG")
+SEPARATOR = "\n"
 
 
 class Translator:
@@ -100,8 +101,9 @@ def serialize(maximum: int) -> str:
     engine = inflect.engine()
     text = ""
     for n in range(1, maximum + 1):
-        text += engine.number_to_words(n, group=0) + SEPARATOR + ' '
-    return text[:-(len(SEPARATOR) + 1)]
+        sep = SEPARATOR if n != maximum else ''
+        text += engine.number_to_words(n, group=0) + sep
+    return text
 
 
 def to_roman(text: str) -> str:
@@ -118,7 +120,7 @@ def deserialize(text: str) -> list:
     Split into a list entry string
     :return: list of numbers
     """
-    return re.sub(rf"('\s+[\\{SEPARATOR}]\s')", SEPARATOR, text, flags=re.UNICODE).split(SEPARATOR)
+    return text.split(SEPARATOR)
 
 
 def __integers_list(opt):
@@ -135,20 +137,47 @@ def __integers_translate(opt):
     :return: print to standard output translated numbers csv,txt or json format
     """
     text = serialize(opt.maximum)
-    translations = {"en": deserialize(text)}
+    # add english numbers
+    translations = {SUPPORTED_LANG["en"]: deserialize(text)}
+    # set translator object
     translator = Translator()
-    for language in opt.language:
-        translations[language] = deserialize(to_roman(translator.translate(lang=language, text=text)))
-    if opt.output == "json":
-        import json
-        print(json.dumps(translations))
-    elif opt.output == "csv":
-        import pandas
-        df = pandas.DataFrame(data=translations)
-        df.to_csv(sys.stdout, sep=',', index=False, lineterminator='\n')
-    else:
-        from tabulate import tabulate
-        print(tabulate(translations, headers="keys"))
+    # set languages list
+    match opt.language:
+        case ["*"] | [None]:
+            languages = list(SUPPORTED_LANG.keys())
+        case _:
+            languages = opt.language
+    logger.debug("Languages .. %s", languages)
+    # loop over languages
+    for language in languages:
+        if language == "en":
+            logger.debug("skipping language .. en (Reason: reflexive translation)")
+            continue
+        if language not in SUPPORTED_LANG:
+            logger.warning("discarding language .. %s (Reason: not supported)", language)
+            continue
+        logger.debug("processing .. %s", language)
+        deserialized = deserialize(to_roman(translator.translate(lang=language, text=text)))
+        if len(deserialized) != opt.maximum:
+            logger.warning("discarding language .. %s "
+                           "(Reason: broken translation [%s/%s])", language, len(deserialized), opt.maximum)
+            continue
+        # add language numbers
+        translations[SUPPORTED_LANG[language]] = deserialized
+    # output data
+    logger.debug("formatting .. %s", opt.output)
+    match opt.output:
+        case "json":
+            import json
+            print(json.dumps(translations))
+        case "csv":
+            import pandas
+            df = pandas.DataFrame(data=translations)
+            df.to_csv(sys.stdout, sep=',', index=False, lineterminator='\n')
+        case _:
+            from tabulate import tabulate
+            print(tabulate(translations, headers="keys"))
+    logger.info("total languages .. %s", len(translations))
 
 
 if __name__ == "__main__":
@@ -164,7 +193,7 @@ if __name__ == "__main__":
                        help="list integers up to this maximum", nargs="?",
                        type=int, default=99)
     sub_2.add_argument("--language", "-l",
-                       help="destination language", nargs="+", type=str, default=[])
+                       help="destination language", nargs="+", type=str, default=["*"])
     sub_2.add_argument("--output", "-o", help="output format", type=str,
                        choices=["text", "csv", "json"], default="text")
 

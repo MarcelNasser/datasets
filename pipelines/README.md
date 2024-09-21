@@ -2,7 +2,8 @@
 
 ### Pipeline Translate
 
-- scope
+- **scope**
+
   - this pipeline generates integers table in more than 50 languages `-o csv`
     - it can output in json `-o json`
     - or in human-readable text `-o text`
@@ -19,13 +20,18 @@
       - some part can scale (deserialization)
       - some part might not (serialization)
 
-- requirements
+
+- **requirements**
+
   - python 3.8+
   - google cloud [cli](https://cloud.google.com/sdk/docs/install)
   - google cloud project for [billing](https://console.cloud.google.com/)
-  - translate api activated
+    - translate api activated
+    - access role to translate API (translate editor or user)
+    - access key to translate API
 
-- setup 
+
+- **setup** 
 
 ````bash
 # install requirements
@@ -35,8 +41,9 @@ python -m unittest pipelines/translate/test.py
 # login to translate API
 gcloud auth application-default login
 # set billing project
-export GOOGLE_PROJECT=tesselite
+export GOOGLE_PROJECT=project-id
 gcloud config set project $GOOGLE_PROJECT
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credential-key.json
 ````
 
 - run
