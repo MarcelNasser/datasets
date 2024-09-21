@@ -147,25 +147,25 @@ def __integers_translate(opt):
             languages = list(SUPPORTED_LANG.keys())
         case _:
             languages = opt.language
-    logger.debug(f"Languages .. {languages}")
+    logger.debug("Languages .. %s", languages)
     # loop over languages
     for language in languages:
         if language == "en":
             logger.debug("skipping language .. en (Reason: reflexive translation)")
             continue
         if language not in SUPPORTED_LANG:
-            logger.warning(f"discarding language .. {language} (Reason: not supported)")
+            logger.warning("discarding language .. %s (Reason: not supported)", language)
             continue
-        logger.debug(f"processing .. {language}")
+        logger.debug("processing .. %s", language)
         deserialized = deserialize(to_roman(translator.translate(lang=language, text=text)))
         if len(deserialized) != opt.maximum:
-            logger.warning(f"discarding language .. {language} "
-                           f"(Reason: broken translation [{len(deserialized)}/{opt.maximum}])")
+            logger.warning("discarding language .. %s "
+                           "(Reason: broken translation [%s/%s])", language, len(deserialized), opt.maximum)
             continue
         # add language numbers
         translations[SUPPORTED_LANG[language]] = deserialized
     # output data
-    logger.debug(f"formatting .. {opt.output}")
+    logger.debug("formatting .. %s", opt.output)
     match opt.output:
         case "json":
             import json
@@ -177,7 +177,7 @@ def __integers_translate(opt):
         case _:
             from tabulate import tabulate
             print(tabulate(translations, headers="keys"))
-    logger.info(f"total languages .. {len(translations)}")
+    logger.info("total languages .. %s", len(translations))
 
 
 if __name__ == "__main__":
