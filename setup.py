@@ -11,6 +11,9 @@ setup(name='pipelines',
       author='Marcel Nasser',
       author_email='marcel.nasser@live.fr',
       url='https://www.python.org/sigs/distutils-sig/',
-      packages=['pipelines'],
-      install_requires=requirements
-      )
+      packages=['pipelines', 'pipelines.translate'],
+      install_requires=requirements,
+      package_data={
+          '': ['*.csv', ],
+      }
+)
