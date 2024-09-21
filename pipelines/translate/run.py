@@ -20,7 +20,7 @@ cache = FanoutCache(directory=str(cache_dir))
 basicConfig(level=ERROR, format="%(levelname)s: %(message)s")
 logger = getLogger("translate")
 logger.setLevel("DEBUG")
-SEPARATOR = " | "
+SEPARATOR = "\n"
 
 
 class Translator:
