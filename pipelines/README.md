@@ -49,11 +49,13 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credential-key.json
 - run
 
 ````bash
+# world
+python pipelines/translate/run.py translate -l "*" -o csv > numerals/world.csv
 # bantu
-python pipelines/translate/run.py translate -l xh ny lg ln zu -o csv > numbers/bantus.csv
+python pipelines/translate/run.py translate -l xh ny lg ln zu -o csv > numerals/bantus.csv
 # indo-european
 python pipelines/translate/run.py translate -l ru uk be bg mk bs hr sr sk pl lv lt sl cs ro sq \
-it el la co es ca fr de no sv fi hu hy ka az -o csv > numbers/indo-european.csv
+it el la co es ca fr de no sv fi hu hy ka az -o csv > numerals/indo-european.csv
 ````
 
 - architecture
